@@ -6,6 +6,7 @@ import DisplayCards from './DisplayCards'
 import Navbar from './Navbar'
 
 function App() {
+    console.log("Rohit");
 
     const [products, setProducts] = useState("");
     const [categoryProducts, setCategoryProducts] = useState("")

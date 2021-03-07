@@ -8,57 +8,51 @@ import Navbar from './Navbar'
 function App() {
 
     const [products, setProducts] = useState("");
-    const [categoryProducts, setCategoryProducts] = useState("")
+    const [productCategory, setProductCategory] = useState([])
 
     useEffect(() => {
-        Axios.get("http://localhost:8080/api/products?size=100")
+        Axios.get("http://localhost:8080/api/products")
             .then((response) => {
                 setProducts(response.data._embedded.products)
-                console.log(response.data._embedded.products);
             })
             .catch((err) => {
                 console.log(err);
                 setProducts("")
             })
-    }, [])
 
-    function handleCategoryClick(event) {
-        const {name} = event.target;
-        let id = null;
-
-        if (name==="Books"){
-            id = "1";
-        }else if (name==="Coffee Mugs"){
-            id = "2";
-        }else if (name==="Mouse Pads"){
-            id = "3";
-        }else if (name==="Luggage Tags"){
-            id = "4";
-        }
-        console.log(typeof(id));
-        Axios.get("http://localhost:8080/api/products/search/findBycategoryId?id="+id)
+        Axios.get("http://localhost:8080/api/product-category")
             .then((response) => {
-                setCategoryProducts(response.data._embedded.products)
-                console.log(response.data._embedded.products);
+                setProductCategory(response.data._embedded.productcategory);
             })
             .catch((err) => {
                 console.log(err);
-                setCategoryProducts("")
+                setProductCategory([]);
+            })
+    }, [])
+
+    function handleCategoryClick(event) {
+        const { id } = event.target;
+
+        Axios.get("http://localhost:8080/api/products/search/findBycategoryId?id=" + id)
+            .then((response) => {
+                setProducts(response.data._embedded.products);
+            })
+            .catch((err) => {
+                console.log(err);
+                setProducts("")
             })
     }
-
-    
 
     return <div>
 
         <Navbar />
-        <div>
-            <button name="Books" onClick={handleCategoryClick}>Books</button>
-            <button name="Coffee Mugs" onClick={handleCategoryClick}>Coffee Mugs</button>
-            <button name="Mouse Pads" onClick={handleCategoryClick}>Mouse Pads</button>
-            <button name="Luggage Tags" onClick={handleCategoryClick}>Luggage Tags</button>
-        </div>
-        {categoryProducts ? <DisplayCards products={categoryProducts} /> : <DisplayCards products={products}/>}
+        {productCategory && <div>
+            {productCategory.map((category) => {
+                return <button key={category.id} id={category.id} onClick={handleCategoryClick}>{category.categoryName}</button>
+            })}
+        </div>}
+
+        {products && <DisplayCards products={products} />}
     </div>
 
 }
